@@ -1,38 +1,24 @@
-.App {
-  text-align: center;
+.stacked-container {
+    position: relative;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.base-img {
+    background: url("./assets/img/naipo-de-k24rOBJ2D_0-unsplash.jpg") center/cover;
+    content: "";
+    top: 0;
+    left: calc(50% - 8rem);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.abs-img {
+    position: absolute;
+    background: url("./assets/img/Credit-Card-Mockup.jpg") center/cover;
+    top: -18%;
+    left: 55%;
+    content: "";
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+@media screen and (min-width: 1024px) {
+    .base-img {
+        top: 25%;
+    }
 }
