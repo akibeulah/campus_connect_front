@@ -25,8 +25,8 @@ import moment from "moment";
 import {refreshTransactions} from "../../store/actions/consumerActions";
 import {toggleTransactionAuth} from "../../store/actions/authActions";
 
-const Flutterwave = require('flutterwave-node-v3');
-const flw = new Flutterwave(PUBLIC_KEY, SECRET_KEY);
+// const Flutterwave = require('flutterwave-node-v3');
+// const flw = new Flutterwave(process.env.REACT_APP_FLW_PLK, process.env.REACT_APP_FLW_SCK);
 
 ChartJS.register(
     CategoryScale,
