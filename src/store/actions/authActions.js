@@ -37,7 +37,7 @@ export const login = (formData) => {
 
 export const loadUser = () => {
     return (dispatch, getState) => {
-        const token = getState().auth.refresh
+        const token = getState().auth.access
 
         if (token) {
             dispatch({
@@ -95,5 +95,23 @@ export const toggleTransactionAuth = (data) => {
                     auth_permissions: resp.data
                 })
             })
+            .catch(() => toast.error("Looks like something's wrong, please try again later!", {
+                position: "top-right"
+            }))
+    }
+}
+
+export const resetPassword = (data) => {
+    return (dispatch) => {
+        axiosInstance.patch('/v1/user/consumer_account_management/reset_password/', {type: data})
+            .then(resp => {
+                dispatch({
+                    type: "RESET_PASSWORD",
+                    response: resp.data
+                })
+            })
+            .catch(() => toast.error("Looks like something's wrong, please try again later!", {
+                position: "top-right"
+            }))
     }
 }

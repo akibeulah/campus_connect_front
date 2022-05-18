@@ -20,6 +20,10 @@ const initialState = {
         rfid_auth_enabled: "",
         consumer_transactions: [],
         vendor_transactions: [],
+        limit_charges: "",
+        daily_transaction_limit: "",
+        pos_enabled: "",
+        atm_enabled: ""
     }
 }
 
@@ -28,7 +32,7 @@ const authReducer = (state = initialState, action) => {
         case "SIGN_IN":
             const user_sign_in = jwtDecode(action.token.refresh)
 
-            toast(`Welcome ${user_sign_in.username.toUpperCase()}`, {
+            toast.success(`Welcome ${user_sign_in.username.toUpperCase()}`, {
                 position: toast.POSITION.TOP_RIGHT
             })
 
@@ -56,6 +60,10 @@ const authReducer = (state = initialState, action) => {
                     rfid_auth_enabled: user_sign_in.rfid_auth_enabled,
                     consumer_transactions: user_sign_in.consumer_transactions,
                     vendor_transactions: user_sign_in.vendor_transactions,
+                    limit_charges: user_sign_in.limit_charges,
+                    daily_transaction_limit: user_sign_in.daily_transaction_limit,
+                    pos_enabled: user_sign_in.pos_enabled,
+                    atm_enabled: user_sign_in.atm_enabled,
                 }
             }
         case "USER_LOADED":
@@ -79,6 +87,10 @@ const authReducer = (state = initialState, action) => {
                     rfid_auth_enabled: user_user_loaded.rfid_auth_enabled,
                     consumer_transactions: user_user_loaded.consumer_transactions,
                     vendor_transactions: user_user_loaded.vendor_transactions,
+                    limit_charges: user_user_loaded.limit_charges,
+                    daily_transaction_limit: user_user_loaded.daily_transaction_limit,
+                    pos_enabled: user_user_loaded.pos_enabled,
+                    atm_enabled:user_user_loaded.atm_enabled,
                 }
             }
         case "SIGN_OUT":
@@ -86,11 +98,11 @@ const authReducer = (state = initialState, action) => {
             const sign_out_config = action.sign_out_config
 
             if (sign_out_config === 0) {
-                toast(`Goodbye ${user_sign_out.username.toUpperCase()}`, {
+                toast.success(`Goodbye ${user_sign_out.username.toUpperCase()}`, {
                     position: toast.POSITION.TOP_RIGHT
                 })
             } else {
-                toast(`Session expired, please login again`, {
+                toast.warning(`Session expired, please login again`, {
                     position: toast.POSITION.TOP_RIGHT
                 })
             }
@@ -119,7 +131,7 @@ const authReducer = (state = initialState, action) => {
                 }
             }
         case "UPDATE_AUTH_PERMISSIONS":
-            toast(action.auth_permissions.message, {
+            toast.success(action.auth_permissions.message, {
                 position: toast.POSITION.TOP_RIGHT
             })
             return {
@@ -128,8 +140,19 @@ const authReducer = (state = initialState, action) => {
                     ...state.user,
                     biometrics_enabled: action.auth_permissions.biometrics_enabled,
                     rfid_auth_enabled: action.auth_permissions.rfid_auth_enabled,
+                    limit_charges: action.auth_permissions.limit_charges,
+                    pos_enabled: action.auth_permissions.pos_enabled,
+                    atm_enabled: action.auth_permissions.pos_enabled,
+
                 }
             }
+
+        case "RESET_PASSWORD":
+            toast.success(action.response.message, {
+                position: toast.POSITION.TOP_RIGHT
+            })
+
+
         default:
             return state
     }

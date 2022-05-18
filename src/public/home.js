@@ -5,9 +5,9 @@ import bg_svg from '../assets/svg/cool-background.svg'
 const Home = () => {
 
     return (
-        <div  style={{ background: `url(${bg_svg}) center/cover no-repeat` }}>
+        <div style={{ background: `url(${bg_svg}) center/cover no-repeat` }}>
             <section className="max-w-7xl mx-auto">
-                <div className="lg:h-screen mt-8 mb-48 md:mb-72 lg:mb-0 flex flex-col lg:flex-row px-8">
+                <div className="lg:h-screen pt-8 mb-48 md:mb-72 lg:mb-0 flex flex-col lg:flex-row px-8">
                     <div className="my-auto w-full lg:w-1/2 text-center font-medium lg:font-light lg:text-left">
                         <div className="text-gray-800 text-4xl md:text-6xl leading-loose">
                             One card <span className="text-orange-600">for your everyday</span> transactional needs

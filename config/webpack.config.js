@@ -298,6 +298,17 @@ module.exports = function (webpackEnv) {
       modules: ['node_modules', paths.appNodeModules].concat(
         modules.additionalModulePaths || []
       ),
+      fallback: {
+        "net": false,
+        "tls": false,
+        "fs": false,
+        "crypto": require.resolve("crypto-browserify"),
+        "path": require.resolve("path-browserify"),
+        "https": require.resolve("https-browserify"),
+        "http": require.resolve("stream-http"),
+        "zlib": require.resolve("browserify-zlib"),
+        "buffer": require.resolve("buffer"),
+      },
       // These are the reasonable defaults supported by the Node ecosystem.
       // We also include JSX as a common component filename extension to support
       // some tools, although we do not recommend using it, see:
@@ -587,6 +598,12 @@ module.exports = function (webpackEnv) {
             : undefined
         )
       ),
+      new webpack.ProvidePlugin({
+        Buffer: ['buffer', 'Buffer'],
+      }),
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
+      }),
       // Inlines the webpack runtime script. This script is too small to warrant
       // a network request.
       // https://github.com/facebook/create-react-app/issues/5358

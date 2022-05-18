@@ -28,7 +28,7 @@ ReactDOM.render(
                        <Route index element={<Home/>}/>
                        <Route path={"login"} element={<Login/>}/>
                        <Route path={"dashboard"} element={<Dashboard/>}/>
-                       <Route path={"sign-out"} element={<SignOut />}/>
+                       <Route path={"signout"} element={<SignOut />}/>
                    </Route>
                </Routes>
            </BrowserRouter>

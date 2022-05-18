@@ -1,6 +1,5 @@
-import React, {Fragment, useRef, useState} from 'react';
+import React, {useState} from 'react';
 import {useDispatch, useSelector} from "react-redux";
-import {Dialog, Transition} from '@headlessui/react'
 import {
     CogIcon,
     FingerPrintIcon,
@@ -21,12 +20,8 @@ import {
 } from 'chart.js'
 import {Chart} from 'react-chartjs-2'
 import moment from "moment";
-
-import {refreshTransactions} from "../../store/actions/consumerActions";
 import {toggleTransactionAuth} from "../../store/actions/authActions";
-
-// const Flutterwave = require('flutterwave-node-v3');
-// const flw = new Flutterwave(process.env.REACT_APP_FLW_PLK, process.env.REACT_APP_FLW_SCK);
+import ReactSwitch from "react-switch";
 
 ChartJS.register(
     CategoryScale,
@@ -42,12 +37,6 @@ const Consumer = (props) => {
     const state = useSelector((state) => state)
     const dispatch = useDispatch()
     const [loading, setLoading] = useState(false)
-
-    const refreshConsumerTransactions = () => {
-        setLoading(true)
-        dispatch(refreshTransactions())
-        setLoading(false)
-    }
 
     const getDataSets = (data) => {
         let res = []
@@ -67,14 +56,14 @@ const Consumer = (props) => {
     const toggleAuth = (type) => {
         setLoading(true)
         dispatch(toggleTransactionAuth(type))
-        console.log(state)
         setLoading(false)
     }
+
     return (
         <>
-            <div className="container p-2 lg:px-8 lg:py-12 mx-auto">
+            <div className="container p-2 lg:px-2 lg:py-12 mx-auto">
                 <h3 className="text-2xl lg:text-5xl font-semibold w-full pt-4 pb-8">Dashboard</h3>
-                <div className="flex flex-col lg:flex-row">
+                <div className="flex flex-col xl:flex-row">
                     <div className="px-2 basis-full lg:basis-4/6">
                         <div className="flex flex-row w-full py-6 overflow-x-scroll scrollbar">
                             <div
@@ -87,14 +76,30 @@ const Consumer = (props) => {
                                     </div>
                                     <div className="flex items-center">
                                     <span className="px-1">
-                                        <IdentificationIcon
-                                            className={state.auth.user.rfid_auth_enabled ? 'cursor-pointer h-6 w-6 lg:h-8 lg:w-8' : 'cursor-pointer h-6 w-6 lg:h-8 lg:w-8 text-gray-500'}
-                                            onClick={() => window.confirm(`This will turn ${state.auth.user.rfid_auth_enabled ? "off" : "on"} RFID authentication for transactions on this account, Are you sure?`) && toggleAuth('rfid')} />
+                                        <ReactSwitch
+                                            checked={state.auth.user.rfid_auth_enabled}
+                                            activeBoxShadow={false}
+                                            checkedIcon={false}
+                                            uncheckedIcon={false}
+                                            handleDiameter={28}
+                                            checkedHandleIcon={<IdentificationIcon
+                                                className={'mx-auto pt-1 h-6 w-6 text-orange-500'}/>}
+                                            uncheckedHandleIcon={<IdentificationIcon
+                                                className={'mx-auto pt-1 h-6 w-6 text-orange-500'}/>}
+                                            onChange={() => window.confirm(`This will turn ${state.auth.user.rfid_auth_enabled ? "off" : "on"} RFID authentication for transactions on this account, Are you sure?`) && toggleAuth('rfid')}/>
                                     </span>
                                         <span className="px-1">
-                                        <FingerPrintIcon
-                                            className={state.auth.user.biometrics_enabled ? 'cursor-pointer h-6 w-6 lg:h-8 lg:w-8' : 'cursor-pointer h-6 w-6 lg:h-8 lg:w-8 text-gray-500'}
-                                            onClick={() => window.confirm(`This will turn ${state.auth.user.rfid_auth_enabled ? "off" : "on"} biometrics authentication for transactions on this account, Are you sure?`) && toggleAuth('fingerprint')} />
+                                            <ReactSwitch
+                                                checked={state.auth.user.biometrics_enabled}
+                                                activeBoxShadow={false}
+                                                checkedIcon={false}
+                                                uncheckedIcon={false}
+                                                handleDiameter={28}
+                                                checkedHandleIcon={<FingerPrintIcon
+                                                    className={'mx-auto pt-1 h-6 w-6 text-orange-500'}/>}
+                                                uncheckedHandleIcon={<FingerPrintIcon
+                                                    className={'mx-auto pt-1 h-6 w-6 text-orange-500'}/>}
+                                                onChange={() => window.confirm(`This will turn ${state.auth.user.rfid_auth_enabled ? "off" : "on"} biometrics authentication for transactions on this account, Are you sure?`) && toggleAuth('fingerprint')}/>
                                     </span>
                                     </div>
                                 </div>
@@ -108,14 +113,16 @@ const Consumer = (props) => {
                                                 <span className="capitalize">{state.auth.user.first_name}</span>
                                             </p>
 
-                                            <CogIcon onClick={() => props.openModal({}, 1)} className={'h-6 w-6 lg:h-8 lg:w-8 cursor-pointer'}/>
+                                            <CogIcon onClick={() => props.openModal({}, 1)}
+                                                     className={'h-6 w-6 lg:h-8 lg:w-8 cursor-pointer'}/>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div
                                 className='text-white drop-shadow-xl max-w-xs border border-orange-400 mx-2 px-5 rounded-xl cursor-pointer'>
-                                <div className="flex justify-between h-full items-center my-auto">
+                                <div className="flex justify-between h-full items-center my-auto"
+                                     onClick={() => props.openModal({}, 2)}>
                                     <PlusCircleIcon className={'h-20 w-20 text-orange-400'}/>
                                 </div>
                             </div>
@@ -140,12 +147,12 @@ const Consumer = (props) => {
                     <div className="mx-2 my-12 lg:my-0 basis-full lg:basis-2/6">
                         <h3 className="text-xl font-semibold flex items-center flex-row">
                             <span className={'pr-2'}>Transactions</span>
-                            <span onClick={refreshConsumerTransactions}
+                            <span onClick={props.refreshTransactions}
                                   className={'rotate-0 hover:rotate-180 transition-all cursor-pointer' + (loading && 'animate-spin')}>
                                 <RefreshIcon className={'h-5 w-5'}/>
                             </span>
                         </h3>
-                        <div className="overflow-y-scroll max-h-screen shadow-inner shadow-lg md:py-4 md:px-2" >
+                        <div className="overflow-y-scroll max-h-screen shadow-inner shadow-lg md:py-4 md:px-2">
                             {
                                 state.consumer.transactions.length !== 0 && state.consumer.transactions.sort((a, b) => Date(a.created_at) - Date(b.created_at)).map((i, k) =>
                                     <div key={k} onClick={() => props.openModal(i, 0)}
@@ -155,9 +162,9 @@ const Consumer = (props) => {
                                                 i.auth_type === "BIOMETRICS" ?
                                                     <FingerPrintIcon className={'h-8 w-8'}/>
                                                     : i.auth_type === "RFID" ?
-                                                    <IdentificationIcon className={'h-8 w-8'}/>
-                                                    :
-                                                    <SupportIcon className={'h-8 w-8'}/>
+                                                        <IdentificationIcon className={'h-8 w-8'}/>
+                                                        :
+                                                        <SupportIcon className={'h-8 w-8'}/>
                                             }
                                             <div>
                                                 <p className="font-semibold text-base">{i.transaction_title}</p>

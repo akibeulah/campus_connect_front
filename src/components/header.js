@@ -14,14 +14,14 @@ const Header = () => {
 
     return (
         <>
-            <nav className="bg-transparent px-6 pt-4">
-                <div className="flex items-center justify-between flex-wrap w-full max-w-7xl mx-auto">
-                    <div className="flex items-center flex-shrink-0 mr-12">
-                        <span className="font-semibold text-xl text-orange-600 tracking-tight">Campus Connect</span>
+            <nav className="bg-transparent pt-2 pb-2 pt-4 drop-shadow-xl shadow-xl">
+                <div className="flex flex-row items-center justify-between flex-wrap w-full max-w-7xl mx-auto">
+                    <div className="flex items-center flex-shrink-0 mr-10">
+                        <span className="font-semibold text-2xl text-orange-600 tracking-tight">Campus Connect</span>
                     </div>
                     <div className="hidden flex-row lg:flex flex-grow flex items-center w-auto">
-                        <div className="text-sm w-100 flex flex-row lg:flex-grow">
-                            <div className="my-auto">
+                        <div className="text-sm w-100 flex flex-row items-center lg:flex-grow">
+                            <div className="my-auto flex flex-row items-center">
                                 {
                                     state.auth.logged_in ?
                                         <>
@@ -52,7 +52,7 @@ const Header = () => {
                                 }
                             </div>
 
-                            <div className="ml-auto">
+                            <div className="ml-auto flex flex-row items-center">
                                 <a href="/"
                                    className="block mt-4 text-gray-800 lg:inline-block lg:mt-0 hover:underline mr-4">
                                     About
@@ -64,9 +64,9 @@ const Header = () => {
                                 {
                                     state.auth.logged_in ?
                                         <>
-                                            <a href="/logout"
+                                            <a href="/signout"
                                                className="block bg-orange-600 hover:bg-orange-800 text-white font-bold py-2 px-4 rounded-full mt-4 lg:inline-block lg:mt-0 text-white mr-4">
-                                                logout
+                                                Logout
                                             </a>
                                         </>
                                         :
