@@ -12,7 +12,7 @@ const Home = () => {
                         <div className="text-gray-800 text-4xl md:text-6xl leading-loose">
                             One card <span className="text-orange-600">for your everyday</span> transactional needs
                         </div>
-                        <div className="py-4 md:py-1 text-lg text-gray-700">Your gateway to payment for - The Future
+                        <div className="py-4 md:py-1 text-lg text-gray-700 capitalize">Your gateway to payment for - The Future
                         </div>
                         <div className="py-4 md:py-1 text-sm text-gray-500">CONVENIENT - RELIABLE - SECURE</div>
                         <div className="py-2">
