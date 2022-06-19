@@ -107,12 +107,7 @@ const Dashboard = () => {
     }
 
     useEffect(() => {
-        const id_1 = setInterval(() =>
-            axios.get('/api/olas/')
-                .then(() => {
-                    refreshTransactions()
-                }), 5000)
-
+        const id_1 = setInterval(() => refreshTransactions(), 5000)
         return () => clearTimeout(id_1)
     }, [])
 
