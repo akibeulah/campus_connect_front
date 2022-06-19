@@ -5,7 +5,7 @@ import axiosInstance from "../axiosInstance";
 export const createSingleUser = (formData) => {
     return (dispatch) => {
         axios
-            .post(`${process.env.REACT_APP_API_URL}v1/user/create_user/`, formData)
+            .post(`${(!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? process.env.REACT_APP_DEV_API_URL : process.env.REACT_APP_PROD_API_URL}v1/user/create_user/`, formData)
             .then(resp => {
                 dispatch({
                     type: "CREATE_SINGLE_USER",
@@ -19,7 +19,7 @@ export const createSingleUser = (formData) => {
 export const login = (formData) => {
     return (dispatch) => {
         axios
-            .post(`${process.env.REACT_APP_API_URL}token/`, formData)
+            .post(`${(!process.env.NODE_ENV || process.env.NODE_ENV === 'development') ? process.env.REACT_APP_DEV_API_URL : process.env.REACT_APP_PROD_API_URL}token/`, formData)
             .then(resp => {
                 dispatch({
                     type: "SIGN_IN",
