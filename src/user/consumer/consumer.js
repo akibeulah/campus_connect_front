@@ -8,30 +8,12 @@ import {
     RefreshIcon,
     SupportIcon
 } from '@heroicons/react/outline'
-import {
-    CategoryScale,
-    Chart as ChartJS,
-    Legend,
-    LinearScale,
-    LineElement,
-    PointElement,
-    Title,
-    Tooltip,
-} from 'chart.js'
-import {Chart} from 'react-chartjs-2'
 import moment from "moment";
 import {toggleTransactionAuth} from "../../store/actions/authActions";
 import ReactSwitch from "react-switch";
-
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend
-)
+import { Chart as ChartJS, registerables } from 'chart.js';
+import { Chart } from 'react-chartjs-2'
+ChartJS.register(...registerables);
 
 const Consumer = (props) => {
     const state = useSelector((state) => state)

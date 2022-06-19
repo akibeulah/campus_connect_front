@@ -11,30 +11,11 @@ import {
 } from "@heroicons/react/outline";
 import {useSelector} from "react-redux";
 import moment from "moment";
-import {Chart} from 'react-chartjs-2'
-import {
-    CategoryScale,
-    Chart as ChartJS,
-    Legend,
-    LinearScale,
-    LineElement,
-    PointElement,
-    Title,
-    Tooltip
-} from "chart.js";
 import axiosInstance from "../../store/axiosInstance";
 import {toast} from "react-toastify";
-
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    PointElement,
-    LineElement,
-    Title,
-    Tooltip,
-    Legend
-)
-
+import { Chart as ChartJS, registerables } from 'chart.js';
+import { Chart } from 'react-chartjs-2'
+ChartJS.register(...registerables)
 
 function Vendor(props) {
     const state = useSelector((state) => state)
