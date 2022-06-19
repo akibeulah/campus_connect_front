@@ -1,15 +1,17 @@
 import {toast} from "react-toastify";
 import axiosInstance from "../axiosInstance"
 
-export const refreshConsumerTransactions = () => {
+export const refreshConsumerTransactions = (prevState) => {
     return (dispatch) => {
         axiosInstance.get('/v1/pos/consumer_transaction_management/')
             .then(resp => {
-                dispatch({
-                    type: "REFRESH_TRANSACTIONS",
-                    user_type: "consumer",
-                    transactions: resp.data
-                })
+                if (prevState !== resp.data) {
+                    dispatch({
+                        type: "REFRESH_TRANSACTIONS",
+                        user_type: "consumer",
+                        transactions: resp.data
+                    })
+                }
             })
             .catch(error => {
                 // console.log(error.response?.data.detail)
@@ -20,15 +22,19 @@ export const refreshConsumerTransactions = () => {
     }
 }
 
-export const refreshVendorTransactions = () => {
+export const refreshVendorTransactions = (prevState) => {
     return (dispatch) => {
         axiosInstance.get('/v1/pos/vendor_transaction_management/')
             .then(resp => {
-                dispatch({
-                    type: "REFRESH_TRANSACTIONS",
-                    user_type: "vendor",
-                    transactions: resp.data
-                })
+                if (prevState !== resp.data) {
+                    console.log(prevState)
+                    console.log(resp.data)
+                    dispatch({
+                        type: "REFRESH_TRANSACTIONS",
+                        user_type: "vendor",
+                        transactions: resp.data
+                    })
+                }
             })
             .catch(error => {
                 // console.log(error.response?.data.detail)
@@ -64,14 +70,16 @@ export const reverseTransactionFromVendor = (id, desc) => {
     }
 }
 
-export const refreshPOSHandover = (data) => {
+export const refreshPOSHandover = (prevState) => {
     return (dispatch) => {
-        axiosInstance.get('/v1/pos/pos_handover_request_management/', data)
+        axiosInstance.get('/v1/pos/pos_handover_request_management/')
             .then(resp => {
-                dispatch({
-                    type: "REFRESH_HANDOVER",
-                    handover: resp.data
-                })
+                if (resp.data !== prevState) {
+                    dispatch({
+                        type: "REFRESH_HANDOVER",
+                        handover: resp.data
+                    })
+                }
             })
             .catch(error => {
                 // console.log(error.response?.data.detail)
@@ -104,15 +112,17 @@ export const requestPOSHandover = (data) => {
     }
 }
 
-export const fetchMessages = () => {
+export const fetchMessages = (prevState) => {
     return (dispatch) => {
         axiosInstance.get('/v1/communication/messages_api/')
             .then(resp => {
                 // console.log(resp.data.map(i => i.read_at === null))
-                dispatch({
-                    type: "REFRESH_MESSAGES",
-                    messages: resp.data.messages
-                })
+                if (prevState !== resp.data) {
+                    dispatch({
+                        type: "REFRESH_MESSAGES",
+                        messages: resp.data.messages
+                    })
+                }
             })
             .catch(error => {
                 // console.log(error.response?.data.detail)

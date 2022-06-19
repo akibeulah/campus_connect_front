@@ -4,8 +4,7 @@ import {Navigate} from "react-router-dom";
 import {
     fetchMessages,
     readMessages,
-    refreshConsumerTransactions,
-    refreshPOSHandover,
+    refreshConsumerTransactions, refreshPOSHandover,
     refreshVendorTransactions,
     requestPOSHandover,
     reverseTransactionFromVendor
@@ -74,6 +73,26 @@ const Dashboard = () => {
     })
     const [openMessage, setOpenMessage] = useState(null)
 
+    useEffect(() => {
+        const id_1 = setInterval(() => refreshTransactions(), 5000)
+        return () => clearTimeout(id_1)
+    }, [])
+
+    useEffect(() => {
+        if (modalType === 16) {
+            dispatch(readMessages({sender: openMessage}))
+            scrollChatToBottom()
+        }
+        // if (modalType === 15) dispatch()
+    }, [modalType])
+
+    useEffect(() => {
+        if (loading) {
+            toast.info("Loading...")
+            setLoading(false)
+        }
+    }, [loading])
+
     const updatePayloadData = (n, v) => {
         if (n === "card_number") {
             setFinPayload({
@@ -100,24 +119,13 @@ const Dashboard = () => {
     }
 
     const refreshTransactions = () => {
-        dispatch(refreshConsumerTransactions())
-        dispatch(refreshVendorTransactions())
-        dispatch(refreshPOSHandover())
-        dispatch(fetchMessages())
-    }
-
-    useEffect(() => {
-        const id_1 = setInterval(() => refreshTransactions(), 5000)
-        return () => clearTimeout(id_1)
-    }, [])
-
-    useEffect(() => {
-        if (modalType === 16) {
-            dispatch(readMessages({sender: openMessage}))
-            scrollChatToBottom()
+        if (auth.user.is_vendor) {
+            dispatch(refreshVendorTransactions(state.consumer.transactions))
+            dispatch(refreshPOSHandover(state.consumer.handover))
+            dispatch(fetchMessages(state.consumer.messages))
         }
-        // if (modalType === 15) dispatch()
-    }, [modalType])
+        else dispatch(refreshConsumerTransactions(state.consumer.transactions))
+    }
 
     const scrollChatToBottom = () => {
         let chat = document.querySelector("#headlessui-dialog-5 > div > div.inline-block.align-bottom.bg-white.transition-all.duration-500.rounded-sm.text-left.overflow-hidden.shadow-xl.transform.sm\\:my-8.sm\\:align-middle.w-full.sm\\:max-w-xl > div.w-full.bg-gray-100.py-4.px-2.overflow-y-scroll.overflow-x-hidden")
@@ -125,13 +133,6 @@ const Dashboard = () => {
             chat.scrollBy(0, 10000000)
         }
     }
-
-    useEffect(() => {
-        if (loading) {
-            toast.info("Loading...")
-            setLoading(false)
-        }
-    }, [loading])
 
     if (!auth.logged_in) {
         return <Navigate to={"/login"}/>;

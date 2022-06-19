@@ -2,7 +2,10 @@
   "name": "cc_frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://cat-fact.herokuapp.com/",
+  "proxy": "https://front-cc.herokuapp.com/dashboard",
+  "engines": {
+    "node": "14.19.1"
+  },
   "dependencies": {
     "@babel/core": "^7.16.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.36",

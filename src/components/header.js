@@ -14,7 +14,7 @@ const Header = () => {
 
     return (
         <>
-            <nav className="bg-transparent pt-2 pb-2 pt-4 drop-shadow-xl shadow-xl">
+            <nav className="bg-transparent pt-2 pb-2 pt-4 px-4 drop-shadow-xl shadow-xl">
                 <div className="flex flex-row items-center justify-between flex-wrap w-full max-w-7xl mx-auto">
                     <div className="flex items-center flex-shrink-0 mr-10">
                         <span className="font-semibold text-2xl text-orange-600 tracking-tight">Campus Connect</span>
