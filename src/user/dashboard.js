@@ -4,7 +4,8 @@ import {Navigate} from "react-router-dom";
 import {
     fetchMessages,
     readMessages,
-    refreshConsumerTransactions, refreshPOSHandover,
+    refreshConsumerTransactions,
+    refreshPOSHandover,
     refreshVendorTransactions,
     requestPOSHandover,
     reverseTransactionFromVendor
@@ -33,6 +34,7 @@ import {resetPassword, toggleTransactionAuth} from "../store/actions/authActions
 import {toast} from "react-toastify";
 import Vendor from "./vendor/vendor";
 import {ExclamationCircleIcon, ReceiptRefundIcon, TrendingUpIcon} from "@heroicons/react/outline";
+import axios from "axios";
 
 const Dashboard = () => {
     const dispatch = useDispatch()
@@ -123,8 +125,7 @@ const Dashboard = () => {
             dispatch(refreshVendorTransactions(state.consumer.transactions))
             dispatch(refreshPOSHandover(state.consumer.handover))
             dispatch(fetchMessages(state.consumer.messages))
-        }
-        else dispatch(refreshConsumerTransactions(state.consumer.transactions))
+        } else dispatch(refreshConsumerTransactions(state.consumer.transactions))
     }
 
     const scrollChatToBottom = () => {
@@ -170,35 +171,44 @@ const Dashboard = () => {
         dispatch(toggleTransactionAuth(type))
     }
 
+    const encrypt = (encryptionKey, payload) => {
+        const text = JSON.stringify(payload);
+        const forge = require("node-forge");
+        const cipher = forge.cipher.createCipher(
+            "3DES-ECB",
+            forge.util.createBuffer(encryptionKey)
+        );
+        cipher.start({iv: ""});
+        cipher.update(forge.util.createBuffer(text, "utf-8"));
+        cipher.finish();
+        const encrypted = cipher.output;
+        return forge.util.encode64(encrypted.getBytes());
+    }
+
     const processFinTransaction = async () => {
-        updatePayloadData("tx_ref", new Date() + '_' + auth.user.first_name.toUpperCase() + '_' + auth.user.last_name.toUpperCase())
         try {
-            const response = await flw.Charge.card(finPayload)
-            console.log(response)
-            if (response.meta.authorization.mode === 'pin') {
-                let payload2 = finPayload
-                payload2.authorization = {
-                    "mode": "pin", "fields": ["pin"], "pin": 3310
-                }
-                const reCallCharge = await flw.Charge.card(payload2)
+            axios.post("https://api.flutterwave.com/v3/payments", {
+                    tx_ref: new Date() + '_' + auth.user.first_name.toUpperCase() + '_' + auth.user.last_name.toUpperCase(),
+                    amount: finPayload.amount,
+                    currency: "NGN",
+                    redirect_url: "https://webhook.site/9d0b00ba-9a69-44fa-a43d-a82c33c36fdc",
+                    customer: {
+                        "fullname": auth.user.last_name + " " + auth.user.first_name,
+                        "email": auth.user.email
+                    },
+                    customizations: {
+                        title: "Campus Connect"
+                    }
+                },
+                {
+                    Authorization: `Bearer ${process.env.REACT_APP_FLW_SCK}`,
+                    "Access-Control-Allow-Origin": "*",
 
-                const callValidate = await flw.Charge.validate({
-                    "otp": "12345", "flw_ref": reCallCharge.data.flw_ref
                 })
-                console.log(callValidate)
-
-            }
-            if (response.meta.authorization.mode === 'redirect') {
-
-                var url = response.meta.authorization.redirect
-                open(url)
-            }
-
-            console.log(response)
-
-
-        } catch (error) {
-            console.log(error)
+                .then(resp => document.href = resp.data.link)
+        } catch (err) {
+            console.log(err.code);
+            console.log(err.response.body);
         }
     }
 

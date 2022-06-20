@@ -13,8 +13,9 @@ import {useSelector} from "react-redux";
 import moment from "moment";
 import axiosInstance from "../../store/axiosInstance";
 import {toast} from "react-toastify";
-import { Chart as ChartJS, registerables } from 'chart.js';
-import { Chart } from 'react-chartjs-2'
+import {Chart as ChartJS, registerables} from 'chart.js';
+import {Chart} from 'react-chartjs-2'
+
 ChartJS.register(...registerables)
 
 function Vendor(props) {
@@ -23,16 +24,14 @@ function Vendor(props) {
 
     const getDataSets = (data) => {
         let res = []
-        const sorted_data = data.sort((a, b) => Date(a.created_at) - Date(b.created_at))
 
-        for (let i = 0; i < sorted_data.length; i++) {
-            if (i === 0) res.push(sorted_data[0] * -1)
+        for (let i = 0; i < data.length; i++) {
+            if (i === 0) res.push(data[0])
             else {
-                res.push(res[res.length - 1] - sorted_data[i])
+                res.push(res[res.length - 1] + data[i])
             }
         }
 
-        state.consumer.transactions.sort((a, b) => Date(a.created_at) - Date(b.created_at)).reverse().map(i => moment.utc(i.created_at).format('MMM Do YY, H:mm'))
         return res
     }
 
@@ -114,12 +113,12 @@ function Vendor(props) {
                             <Chart
                                 type={'line'}
                                 data={{
-                                    labels: state.consumer.transactions.length !== 0 && state.consumer.transactions.sort((a, b) => Date(a.created_at) - Date(b.created_at)).map(i => moment.utc(i.created_at).format('MMM Do YY, H:mm')),
+                                    labels: state.consumer.transactions.length !== 0 && state.consumer.transactions.map(i => moment.utc(i.created_at).format('MMM Do YY, H:mm')).reverse(),
                                     datasets: [{
                                         label: 'Transactions',
                                         backgroundColor: 'rgb(213,92,42)',
                                         borderColor: 'rgb(213,92,42)',
-                                        data: state.consumer.transactions.length !== 0 && getDataSets(state.consumer.transactions.map(i => i.transaction_type === "IN" ? parseFloat(i.transaction_amount) : (-1 * parseFloat(i.transaction_amount))))
+                                        data: state.consumer.transactions.length !== 0 && getDataSets(state.consumer.transactions.map(i => i.transaction_type === "OUT" ? parseFloat(i.transaction_amount) : (-1 * parseFloat(i.transaction_amount))).reverse())
                                     }]
                                 }}
 

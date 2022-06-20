@@ -44,6 +44,7 @@
     "flutterwave-node-v3": "^1.0.9",
     "formik": "^2.2.9",
     "fs-extra": "^10.0.0",
+    "got": "^12.1.0",
     "history": "^5.2.0",
     "html-webpack-plugin": "^5.5.0",
     "https-browserify": "^1.0.0",
