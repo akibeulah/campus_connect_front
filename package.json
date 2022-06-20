@@ -2,7 +2,6 @@
   "name": "cc_frontend",
   "version": "0.1.0",
   "private": true,
-  "proxy": "https://front-cc.herokuapp.com/dashboard",
   "engines": {
     "node": "14.19.1"
   },

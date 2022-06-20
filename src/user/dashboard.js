@@ -1,6 +1,7 @@
 import React, {Fragment, useEffect, useRef, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import {Navigate} from "react-router-dom";
+// import got from 'got';
 import {
     fetchMessages,
     readMessages,
@@ -171,20 +172,6 @@ const Dashboard = () => {
         dispatch(toggleTransactionAuth(type))
     }
 
-    const encrypt = (encryptionKey, payload) => {
-        const text = JSON.stringify(payload);
-        const forge = require("node-forge");
-        const cipher = forge.cipher.createCipher(
-            "3DES-ECB",
-            forge.util.createBuffer(encryptionKey)
-        );
-        cipher.start({iv: ""});
-        cipher.update(forge.util.createBuffer(text, "utf-8"));
-        cipher.finish();
-        const encrypted = cipher.output;
-        return forge.util.encode64(encrypted.getBytes());
-    }
-
     const processFinTransaction = async () => {
         try {
             axios.post("https://api.flutterwave.com/v3/payments", {
@@ -210,6 +197,30 @@ const Dashboard = () => {
             console.log(err.code);
             console.log(err.response.body);
         }
+
+        // try {
+        //     const response = await got.post("https://api.flutterwave.com/v3/payments/", {
+        //         headers: {
+        //             Authorization: `Bearer ${process.env.REACT_APP_FLW_SCK}`
+        //         },
+        //         json: {
+        //             tx_ref: new Date() + '_' + auth.user.first_name.toUpperCase() + '_' + auth.user.last_name.toUpperCase(),
+        //             amount: finPayload.amount,
+        //             currency: "NGN",
+        //             redirect_url: "https://back-cc.herokuapp.com/v_topup/confirmation",
+        //             customer: {
+        //                 "fullname": auth.user.last_name + " " + auth.user.first_name,
+        //                 "email": auth.user.email
+        //             },
+        //             customizations: {
+        //                 title: "Campus Connect"
+        //             }
+        //         }
+        //     }).json();
+        // } catch (err) {
+        //     console.log(err.code);
+        //     console.log(err.response.body);
+        // }
     }
 
     const processChgPwdTransaction = () => {
