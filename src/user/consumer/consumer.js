@@ -39,6 +39,10 @@ const Consumer = (props) => {
         setLoading(false)
     }
 
+    const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency', currency: 'NGN'
+    });
+
     return (
         <>
             <div className="container p-2 lg:px-2 lg:py-12 mx-auto">
@@ -51,8 +55,8 @@ const Consumer = (props) => {
                                 style={{width: "320px"}}>
                                 <div className="flex justify-between">
                                     <div>
-                                        <h2 className={'text-sm lg:text-lg'}> Main Balance </h2>
-                                        <p className='text:xl lg:text-2xl font-bold'>₦{state.consumer.transactions.length !== 0 && state.consumer.transactions.map(i => i.transaction_type === "IN" ? parseFloat(i.transaction_amount) : (-1 * parseFloat(i.transaction_amount))).reduce((a, b) => a + b, 0)}</p>
+                                        <h2 className={'text-sm lg:text-md'}> Main Balance </h2>
+                                        <p className='text:xl lg:text-xl font-bold'>{formatter.format(state.consumer.transactions.length !== 0 && state.consumer.transactions.map(i => i.transaction_type === "IN" ? parseFloat(i.transaction_amount) : (-1 * parseFloat(i.transaction_amount))).reduce((a, b) => a + b, 0))}</p>
                                     </div>
                                     <div className="flex items-center">
                                     <span className="px-1">

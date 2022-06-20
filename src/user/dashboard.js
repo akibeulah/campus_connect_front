@@ -3,6 +3,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {Navigate} from "react-router-dom";
 // import got from 'got';
 import {
+    confirmPayment,
     fetchMessages,
     readMessages,
     refreshConsumerTransactions,
@@ -30,7 +31,7 @@ import Admin from "./admin/admin";
 import Consumer from "./consumer/consumer";
 import {Tab, TabList, TabPanel, Tabs} from "react-tabs";
 import ReactSwitch from "react-switch";
-import Flutterwave from "flutterwave-node-v3";
+import {closePaymentModal, FlutterWaveButton} from 'flutterwave-react-v3';
 import {resetPassword, toggleTransactionAuth} from "../store/actions/authActions";
 import {toast} from "react-toastify";
 import Vendor from "./vendor/vendor";
@@ -62,7 +63,6 @@ const Dashboard = () => {
         "new_password": "",
         "new_password_2": ""
     })
-    const flw = new Flutterwave(process.env.REACT_APP_FLW_PLK, process.env.REACT_APP_FLW_SCK);
     const [securityPage, setSecurityPage] = useState(0)
     const [loading, setLoading] = useState(false)
     const [dailyLimit, setDailyLimit] = useState(0)
@@ -172,56 +172,36 @@ const Dashboard = () => {
         dispatch(toggleTransactionAuth(type))
     }
 
-    const processFinTransaction = async () => {
-        try {
-            axios.post("https://api.flutterwave.com/v3/payments", {
-                    tx_ref: new Date() + '_' + auth.user.first_name.toUpperCase() + '_' + auth.user.last_name.toUpperCase(),
-                    amount: finPayload.amount,
-                    currency: "NGN",
-                    redirect_url: "https://webhook.site/9d0b00ba-9a69-44fa-a43d-a82c33c36fdc",
-                    customer: {
-                        "fullname": auth.user.last_name + " " + auth.user.first_name,
-                        "email": auth.user.email
-                    },
-                    customizations: {
-                        title: "Campus Connect"
-                    }
-                },
-                {
-                    Authorization: `Bearer ${process.env.REACT_APP_FLW_SCK}`,
-                    "Access-Control-Allow-Origin": "*",
+    const fwConfig = {
+        ...{
+            public_key: process.env.REACT_APP_FLW_PLK,
+            tx_ref: new Date() + '_' + auth.user.first_name.toUpperCase() + '_' + auth.user.last_name.toUpperCase(),
+            amount: finPayload.amount,
+            currency: 'NGN',
+            payment_options: 'card',
+            customer: {
+                "fullname": auth.user.last_name + " " + auth.user.first_name,
+                "email": auth.user.email
+            },
+            customizations: {
+                description: 'Account TopUp',
+                title: "Campus Connect"
+            },
+        },
+        text: `Pay ${formatter.format(finPayload.amount)}`,
+        callback: (response) => {
+            console.log(response);
+            let bodyFormData = new FormData()
 
-                })
-                .then(resp => document.href = resp.data.link)
-        } catch (err) {
-            console.log(err.code);
-            console.log(err.response.body);
+            bodyFormData.append("amount", finPayload.amount)
+            bodyFormData.append("desc", finPayload.tx_ref)
+
+            dispatch(confirmPayment(bodyFormData))
+            closePaymentModal() // this will close the modal programmatically
+            setOpen(false)
+            setDataDefaults()
         }
-
-        // try {
-        //     const response = await got.post("https://api.flutterwave.com/v3/payments/", {
-        //         headers: {
-        //             Authorization: `Bearer ${process.env.REACT_APP_FLW_SCK}`
-        //         },
-        //         json: {
-        //             tx_ref: new Date() + '_' + auth.user.first_name.toUpperCase() + '_' + auth.user.last_name.toUpperCase(),
-        //             amount: finPayload.amount,
-        //             currency: "NGN",
-        //             redirect_url: "https://back-cc.herokuapp.com/v_topup/confirmation",
-        //             customer: {
-        //                 "fullname": auth.user.last_name + " " + auth.user.first_name,
-        //                 "email": auth.user.email
-        //             },
-        //             customizations: {
-        //                 title: "Campus Connect"
-        //             }
-        //         }
-        //     }).json();
-        // } catch (err) {
-        //     console.log(err.code);
-        //     console.log(err.response.body);
-        // }
-    }
+    };
 
     const processChgPwdTransaction = () => {
         if (pwdPayload.new_password === pwdPayload.new_password_2) {
@@ -662,57 +642,56 @@ const Dashboard = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="flex flex-col pt-6">
-                                                <span className="relative">
-                                                    <label htmlFor="card_number"
-                                                           className="absolute top-0 font-normal text-black pl-3 pt-2 text-sm">Card Number</label>
-                                                    <input
-                                                        className="appearance-none border w-full pt-8 pb-2 rounded-t-sm px-3 text-gray-700 leading-tight outline-1 outline-transparent focus:outline-orange-400 transition-all ease-in-out duration-500"
-                                                        id="card_number" name="card_number"
-                                                        value={finPayload.card_number.trim()}
-                                                        onChange={(e) => updatePayloadData(e.target.name, e.target.value)}
-                                                        type="text" placeholder="0000 0000 0000 0000"/>
-                                                </span>
-                                                    <span className="grid grid-cols-1 sm:grid-cols-2 gap-0">
-                                                    <span className="flex flex-row">
-                                                        <span className="relative">
-                                                            <label htmlFor="exp_mth"
-                                                                   className="absolute top-0 font-normal text-black pl-3 pt-2 text-sm">Expiry Month</label>
-                                                                <input
-                                                                    className="show appearance-none border rounded-bl-sm w-full pt-8 pb-2 px-3 text-gray-700 leading-tight outline-1 outline-transparent focus:outline-orange-400 transition-all ease-in-out duration-500"
-                                                                    id="exp_mth" name="expiry_month"
-                                                                    value={finPayload.expiry_month}
-                                                                    onChange={(e) => updatePayloadData(e.target.name, e.target.value)}
-                                                                    type="text" placeholder="MM" maxLength={2}/>
-                                                        </span>
-                                                        <span className="px-1 pt-8 pb-2 text-gray-500">/</span>
-                                                        <span className="relative">
-                                                            <label htmlFor="exp_yr"
-                                                                   className="absolute top-0 font-normal text-black pl-3 pt-2 text-sm">Expiry Year</label>
-                                                                <input
-                                                                    className="show appearance-none border w-full pt-8 pb-2 px-3 text-gray-700 leading-tight outline-1 outline-transparent focus:outline-orange-400 transition-all ease-in-out duration-500"
-                                                                    id="exp_yr" name="expiry_year"
-                                                                    value={finPayload.expiry_year}
-                                                                    onChange={(e) => updatePayloadData(e.target.name, e.target.value)}
-                                                                    type="text" placeholder="YY" maxLength={2}/>
-                                                        </span>
-                                                    </span>
-                                                    <span className="relative">
-                                                        <label htmlFor="cvv"
-                                                               className="absolute top-0 font-normal text-black pl-3 pt-2 text-sm">CVV</label>
-                                                        <input
-                                                            className="appearance-none border rounded-br-sm w-full pt-8 pb-2 px-3 text-gray-700 leading-tight outline-1 outline-transparent focus:outline-orange-400 transition-all ease-in-out duration-500"
-                                                            id="cvv" name="cvv"
-                                                            onChange={(e) => updatePayloadData(e.target.name, e.target.value)}
-                                                            type="text" placeholder="123" maxLength={4}/>
-                                                    </span>
-                                                </span>
-                                                </div>
+                                                {/*<div className="flex flex-col pt-6">*/}
+                                                {/*<span className="relative">*/}
+                                                {/*    <label htmlFor="card_number"*/}
+                                                {/*           className="absolute top-0 font-normal text-black pl-3 pt-2 text-sm">Card Number</label>*/}
+                                                {/*    <input*/}
+                                                {/*        className="appearance-none border w-full pt-8 pb-2 rounded-t-sm px-3 text-gray-700 leading-tight outline-1 outline-transparent focus:outline-orange-400 transition-all ease-in-out duration-500"*/}
+                                                {/*        id="card_number" name="card_number"*/}
+                                                {/*        value={finPayload.card_number.trim()}*/}
+                                                {/*        onChange={(e) => updatePayloadData(e.target.name, e.target.value)}*/}
+                                                {/*        type="text" placeholder="0000 0000 0000 0000"/>*/}
+                                                {/*</span>*/}
+                                                {/*    <span className="grid grid-cols-1 sm:grid-cols-2 gap-0">*/}
+                                                {/*    <span className="flex flex-row">*/}
+                                                {/*        <span className="relative">*/}
+                                                {/*            <label htmlFor="exp_mth"*/}
+                                                {/*                   className="absolute top-0 font-normal text-black pl-3 pt-2 text-sm">Expiry Month</label>*/}
+                                                {/*                <input*/}
+                                                {/*                    className="show appearance-none border rounded-bl-sm w-full pt-8 pb-2 px-3 text-gray-700 leading-tight outline-1 outline-transparent focus:outline-orange-400 transition-all ease-in-out duration-500"*/}
+                                                {/*                    id="exp_mth" name="expiry_month"*/}
+                                                {/*                    value={finPayload.expiry_month}*/}
+                                                {/*                    onChange={(e) => updatePayloadData(e.target.name, e.target.value)}*/}
+                                                {/*                    type="text" placeholder="MM" maxLength={2}/>*/}
+                                                {/*        </span>*/}
+                                                {/*        <span className="px-1 pt-8 pb-2 text-gray-500">/</span>*/}
+                                                {/*        <span className="relative">*/}
+                                                {/*            <label htmlFor="exp_yr"*/}
+                                                {/*                   className="absolute top-0 font-normal text-black pl-3 pt-2 text-sm">Expiry Year</label>*/}
+                                                {/*                <input*/}
+                                                {/*                    className="show appearance-none border w-full pt-8 pb-2 px-3 text-gray-700 leading-tight outline-1 outline-transparent focus:outline-orange-400 transition-all ease-in-out duration-500"*/}
+                                                {/*                    id="exp_yr" name="expiry_year"*/}
+                                                {/*                    value={finPayload.expiry_year}*/}
+                                                {/*                    onChange={(e) => updatePayloadData(e.target.name, e.target.value)}*/}
+                                                {/*                    type="text" placeholder="YY" maxLength={2}/>*/}
+                                                {/*        </span>*/}
+                                                {/*    </span>*/}
+                                                {/*    <span className="relative">*/}
+                                                {/*        <label htmlFor="cvv"*/}
+                                                {/*               className="absolute top-0 font-normal text-black pl-3 pt-2 text-sm">CVV</label>*/}
+                                                {/*        <input*/}
+                                                {/*            className="appearance-none border rounded-br-sm w-full pt-8 pb-2 px-3 text-gray-700 leading-tight outline-1 outline-transparent focus:outline-orange-400 transition-all ease-in-out duration-500"*/}
+                                                {/*            id="cvv" name="cvv"*/}
+                                                {/*            onChange={(e) => updatePayloadData(e.target.name, e.target.value)}*/}
+                                                {/*            type="text" placeholder="123" maxLength={4}/>*/}
+                                                {/*    </span>*/}
+                                                {/*</span>*/}
+                                                {/*</div>*/}
 
                                                 <div className="pt-8">
-                                                    <button onClick={processFinTransaction}
-                                                            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-5 px-4 rounded-b-sm w-full">
-                                                        Pay {formatter.format(finPayload.amount)}
+                                                    <button className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-5 px-4 rounded-b-sm w-full">
+                                                        <FlutterWaveButton {...fwConfig} />
                                                     </button>
                                                 </div>
                                             </div>

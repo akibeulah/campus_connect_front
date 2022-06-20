@@ -151,3 +151,10 @@ export const readMessages = (data) => {
             })
     }
 }
+
+export const confirmPayment = (data) => {
+    return (dispatch) => {
+        axiosInstance.post("/v1/pos/consumer_transaction_management/top_up_confirmation/", data)
+            .then(resp => console.log(resp))
+    }
+}

@@ -50,6 +50,10 @@ function Vendor(props) {
             })
     }
 
+    const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency', currency: 'NGN'
+    });
+
     return (
         <>
             <div className="container p-2 lg:px-2 lg:py-12 mx-auto">
@@ -69,7 +73,7 @@ function Vendor(props) {
                                     <div className={'flex flex-row items-center justify-between'}>
                                         <div className="">
                                             <h2 className={'text-sm lg:text-md'}> Main Balance </h2>
-                                            <p className='text:xl lg:text-2xl font-bold'>₦{state.consumer.transactions.length !== 0 && state.consumer.transactions.map(i => i.transaction_type === "OUT" ? parseFloat(i.transaction_amount) : (-1 * parseFloat(i.transaction_amount))).reduce((a, b) => a + b, 0)}</p>
+                                            <p className='text:xl lg:text-2xl font-bold'>{formatter.format(state.consumer.transactions.length !== 0 && state.consumer.transactions.map(i => i.transaction_type === "OUT" ? parseFloat(i.transaction_amount) : (-1 * parseFloat(i.transaction_amount))).reduce((a, b) => a + b, 0))}</p>
                                         </div>
                                         <CollectionIcon onClick={reqRem}
                                                         className={'h-8 w-8 cursor-pointer transition-color'}/>
